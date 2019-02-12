@@ -15,5 +15,5 @@ module.exports = class Test extends Command {
     });
     this.client = client;
   }
-  async execute(message: Message, args: string[]) { return await message.channel.send('hi'); };
+  async execute(message: Message, args: string[]) { return console.log(message.guild.me.voice.speaking); };
 }

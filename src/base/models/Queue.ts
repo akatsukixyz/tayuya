@@ -7,3 +7,4 @@ const Queue = mongoose.Schema({
     strict: true
 });
 module.exports = mongoose.model('Queue', Queue);
+export default mongoose.model('Queue', Queue);

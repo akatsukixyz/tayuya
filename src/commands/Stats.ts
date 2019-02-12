@@ -27,6 +27,7 @@ module.exports = class Stats extends Command {
       .addField('Servers', `${this.client.guilds.size} servers`, true)
       .addField('Users', `${this.client.users.size} users`, true)
       .addField('Shards', `${this.client.shard ? this.client.shard.count : 0} (#${this.client.shard ? this.client.shard.id : 0})`, true)
+      .addField('Connections', `${this.client.voiceConnections.size} total`)
       .setColor(this.client.color);
     return await message.channel.send(embed);
   }
