@@ -1,0 +1,19 @@
+{
+  "name": "tayuya",
+  "version": "0.0.1",
+  "description": "A lightweight, flexible music bot",
+  "main": "tayuya.js",
+  "repository": "https://github.com/knowitallking/tayuya",
+  "author": "Yahiko",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^10.12.24",
+    "async-redis": "^1.1.5",
+    "discord.js": "discordjs/discord.js",
+    "dotenv": "^6.2.0",
+    "mongoose": "^5.4.11",
+    "node-opus": "^0.3.1",
+    "youtube-search": "^1.1.4",
+    "ytdl-core": "^0.29.1"
+  }
+}
