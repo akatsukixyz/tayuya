@@ -55,8 +55,7 @@ module.exports = class Play extends Command {
     return await ytdl.getInfo(results[0].link) || null;
   };
   async playSong(url: string, connection: VoiceConnection): Promise<[VoiceChannel, StreamDispatcher]> {
-    try { var dispatcher: StreamDispatcher = await connection.play(ytdl(url)) }
-    catch(e) { return null; };
+    var dispatcher: StreamDispatcher = await connection.play(ytdl(url));
     return [connection.channel, dispatcher];
   };
   async pullThrough(connection: VoiceConnection, dispatcher: StreamDispatcher, results: ytdl.videoInfo, guild: string, author: string): Promise<any> {
@@ -77,7 +76,6 @@ module.exports = class Play extends Command {
     var connection = this.client.connections.get(message.guild.id) || await message.member.voice.channel.join();
     try { var [vchan, dispatcher] = await this.playSong(result.video_url, connection); }
     catch(e) { return console.log(e) };
-    console.log(typeof vchan, typeof dispatcher);
     dispatcher.once('finish', async () => await this.finish(message.guild.id));
     await this.pullThrough(connection, dispatcher, result, message.guild.id, message.author.id);
     const embed = new MessageEmbed()
