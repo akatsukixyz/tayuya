@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import { Command } from '../structures/Command';
 import { Tayuya } from '../structures/TayuyaClient';
+const Queue = require('../base/models/Queue');
 module.exports = class Leave extends Command {
   constructor(client: Tayuya){
     super({
@@ -25,6 +26,7 @@ module.exports = class Leave extends Command {
     if(this.client.dispatchers.has(message.guild.id)) this.client.dispatchers.delete(message.guild.id);
     if(this.client.vchannels.has(message.guild.id)) this.client.vchannels.delete(message.guild.id);
     if(this.client.connections.has(message.guild.id)) this.client.connections.delete(message.guild.id);
+    await Queue.findOneAndUpdate({ guild: message.guild.id }, { $unset: { now: '' } });
     return await m.edit(`Left ${chan.name}`);
   }
 }
