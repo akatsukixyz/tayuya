@@ -25,7 +25,7 @@ module.exports = class Queue extends Command {
         for(let i = 0; i < songs.length; i++) embed.addField(`#${i+1}`, `Name: ${songs[i].name}\nURL: ${songs[i].url}\nRequester: <@${songs[i].author}>`, true);
         return await message.channel.send(embed);
       } 
-      if(!args[0])return await sendDefault(this.client);
+      if(!args[0]) return await sendDefault(this.client);
       if(args[0].toLowerCase() === 'clear') {
           await Queue.findOneAndUpdate({ guild: message.guild.id }, { $set: { songs: [] } });
           return await message.channel.send(`Successfully cleared the queue.`);

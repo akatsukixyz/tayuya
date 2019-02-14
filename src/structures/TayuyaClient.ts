@@ -1,6 +1,7 @@
 import { BaseClient } from '../base/structures/Client';
 import { StreamDispatcher, VoiceConnection, Collection, VoiceChannel } from 'discord.js';
 import { EventEmitter } from 'events';
+import { QueueType } from '../base/types/Queue';
 const Queue = require('../base/models/Queue');  
 export class Tayuya extends BaseClient {
   public prefix: string;
@@ -20,10 +21,14 @@ export class Tayuya extends BaseClient {
       this.connections = new Collection();
       this.dispatchers = new Collection();
       this.vchannels = new Collection();
-      this.queue = new EventEmitter();
-      this.queue.on('pushQueue', this.pushQueue);
   };
-  private async pushQueue(obj): Promise<{guild: string, name: string, url: string, ID: string, author: string}> {
-    return await Queue.findOneAndUpdate({ guild: obj.guild }, { $push: { songs: obj }}, { new: true });
-  }
+  public ensurePlaying() {
+    // setInterval(async () => {
+    //   const { songs } = await Queue.find();
+    //   if(songs.length <= 0) return;
+    // });
+  };
+  public async pushQueue(song: QueueType, guild: string) {
+    return await Queue.findOneAndUpdate({ guild }, { $push: { songs: song } });
+  };
 };

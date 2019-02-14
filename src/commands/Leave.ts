@@ -21,6 +21,9 @@ module.exports = class Leave extends Command {
     if(!chan) return await message.channel.send(`Error: I'm not connected to a voice channel!`);
     const m: any = await message.channel.send(`Leaving ${chan.name}...`);
     await message.guild.me.voice.channel.leave();
+    if(this.client.dispatchers.has(message.guild.id)) this.client.dispatchers.delete(message.guild.id);
+    if(this.client.vchannels.has(message.guild.id)) this.client.vchannels.delete(message.guild.id);
+    if(this.client.connections.has(message.guild.id)) this.client.connections.delete(message.guild.id);
     return await m.edit(`Left ${chan.name}`);
   }
 }
