@@ -75,7 +75,8 @@ module.exports = class Play extends Command {
     const result = await this.findSong(args.join(' ').trim());
     if(!result) return await message.channel.send(`Error: No video found.`);
     var connection = this.client.connections.get(message.guild.id) || await message.member.voice.channel.join();
-    const [vchan, dispatcher] = await this.playSong(result.video_url, connection);
+    try { var [vchan, dispatcher] = await this.playSong(result.video_url, connection); }
+    catch(e) { return console.log(e) };
     console.log(typeof vchan, typeof dispatcher);
     dispatcher.once('finish', async () => await this.finish(message.guild.id));
     await this.pullThrough(connection, dispatcher, result, message.guild.id, message.author.id);
