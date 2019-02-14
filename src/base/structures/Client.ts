@@ -20,8 +20,8 @@ export class BaseClient extends Client {
   public constructor(options: BaseOptions, clientOptions: ClientOptions) { 
     super(clientOptions);
     this.commands = new Collection(); 
-    this.commandsDir = options.commandsDir ? path.resolve(options.commandsDir!) : null;
-    this.eventsDir = options.eventsDir ? path.resolve(options.eventsDir!) : null;
+    this.commandsDir = options.commandsDir || null;
+    this.eventsDir = options.eventsDir || null;
     this.eventHandler = new EventHandler(this);
     this.eventHandler.load();
     this.commandHandler = new CommandHandler(this);

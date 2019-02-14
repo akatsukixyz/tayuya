@@ -15,8 +15,8 @@ export class Tayuya extends BaseClient {
       prefix: 't',
       color: '#a64f59',
       owner: '517016133694521374',
-      commandsDir: `./dist/commands`,
-      eventsDir: `./dist/events`
+      commandsDir: 'commands',
+      eventsDir: 'events'
       }, options);
       this.connections = new Collection();
       this.dispatchers = new Collection();
