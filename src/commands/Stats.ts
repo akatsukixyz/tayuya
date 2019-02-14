@@ -17,9 +17,9 @@ module.exports = class Stats extends Command {
     this.client = client;
   }
   async execute(message: Message, args: string[]) {
-    const usage: any = Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+    const usage: any = Math.round(process.memoryUsage().heapUsed / 10 / 1024),
      total: any = Math.round(totalmem() / 1024 / 1024),
-     percent = Math.round(((usage / total) * 10000));
+     percent = Math.round(((usage / total) * 100));
     const embed = new MessageEmbed()
       .setAuthor('Stats', this.client.user.displayAvatarURL())
       .addField('Memory Usage', `${usage} / ${total} MB (${percent}%)`, true)
