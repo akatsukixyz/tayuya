@@ -7,7 +7,7 @@ module.exports = class Queue extends Command {
       name: 'Queue',
       description: 'Queue command',
       usage: `\`${client.prefix}queue\``,
-      aliases: ['`q`', '`songs`'],
+      aliases: ['`q`', '`songs`', '`now`'],
       category: 'music',
       senderPerms: ['SEND_MESSAGES'],
       clientPerms: ['SEND_MESSAGES', 'CONNECT', 'SPEAK'],
@@ -18,10 +18,11 @@ module.exports = class Queue extends Command {
   async execute(message: Message, args: string[]) {
     const Queue = require('../base/models/Queue');
       async function sendDefault(client: Tayuya) {
-        const { songs } = await Queue.findOne({ guild: message.guild.id });
+        const { now, songs } = await Queue.findOne({ guild: message.guild.id });
         const embed = new MessageEmbed()
             .setAuthor(`Queue`, message.guild.iconURL())
-            .setColor(client.color);
+            .setColor(client.color)
+            .addField(`Now Playing: ${now.name}`, `URL: ${now.url}\nRequester: <@${now.author}>`);
         for(let i = 0; i < songs.length; i++) embed.addField(`#${i+1} | \`${songs[i].name}\``, `URL: ${songs[i].url}\nRequester: <@${songs[i].author}>`, true);
         return await message.channel.send(embed);
       } 
