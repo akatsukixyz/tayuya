@@ -7,7 +7,7 @@ module.exports = class Leave extends Command {
       name: 'Leave',
       description: 'Leave command',
       usage: `\`${client.prefix}leave\``,
-      aliases: ['`leavechannel`'],
+      aliases: ['`leavechannel`', '`l`'],
       category: 'music',
       senderPerms: ['SEND_MESSAGES'],
       clientPerms: ['SPEAK', 'CONNECT'],
@@ -16,9 +16,10 @@ module.exports = class Leave extends Command {
     this.client = client;
   }
   async execute(message: Message, args: string[]) {
-    if(!message.member.voice.channel) return await message.channel.send(`Error: You must be connected to the same voice channel!`);
     const chan = message.guild.me.voice.channel;
     if(!chan) return await message.channel.send(`Error: I'm not connected to a voice channel!`);
+    if(!message.member.voice.channel || message.member.voice.channel !== chan) return await message.channel.send(`Error: You must be connected to the same voice channel!`);
+    if(this.client.vchannels.get(message.guild.id) !== chan) return await message.channel.send(`Error: I'm connected to a different voice channel!`);
     const m: any = await message.channel.send(`Leaving ${chan.name}...`);
     await message.guild.me.voice.channel.leave();
     if(this.client.dispatchers.has(message.guild.id)) this.client.dispatchers.delete(message.guild.id);

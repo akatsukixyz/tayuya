@@ -1,4 +1,4 @@
-import { Message, VoiceChannel, VoiceConnection, StreamDispatcher } from 'discord.js';
+import { Message, VoiceChannel, VoiceConnection, StreamDispatcher, MessageEmbed } from 'discord.js';
 import { Command } from '../structures/Command';
 import * as ytdl from 'ytdl-core';
 import { Tayuya } from '../structures/TayuyaClient';
@@ -11,8 +11,8 @@ module.exports = class Play extends Command {
     super({
       name: 'Play',
       description: 'Play command',
-      usage: `\`${client.prefix}play\``,
-      aliases: ['`playsong`'],
+      usage: `\`${client.prefix}play <song>\``,
+      aliases: ['`playsong`', '`p`'],
       category: 'music',
       senderPerms: ['SEND_MESSAGES'],
       clientPerms: ['SPEAK', 'CONNECT'],
@@ -72,11 +72,16 @@ module.exports = class Play extends Command {
   async execute(message: Message, args: string[]) {
     if(!message.member.voice.channel) return await message.channel.send(`Error: You must be connected to a voice channel!`);
     if(!args[0]) return await message.channel.send(`Error: Incorrect usage. ${this.usage}`);
-    const results = await this.findSong(args.join(' ').trim());
-    if(!results) return await message.channel.send(`Error: No video found.`);
+    const result = await this.findSong(args.join(' ').trim());
+    if(!result) return await message.channel.send(`Error: No video found.`);
     var connection = this.client.connections.get(message.guild.id) || await message.member.voice.channel.join();
-    const [, dispatcher] = await this.playSong(results.video_url, connection);
+    const [, dispatcher] = await this.playSong(result.video_url, connection);
     dispatcher.once('finish', async () => await this.finish(message.guild.id));
-    await this.pullThrough(connection, dispatcher, results, message.guild.id, message.author.id);
+    await this.pullThrough(connection, dispatcher, result, message.guild.id, message.author.id);
+    const embed = new MessageEmbed()
+      .setAuthor(`Queue Addition`, message.guild.iconURL())
+      .addField(`${result.title}`, `URL: ${result.video_url}\nRequester: ${message.author}`)
+      .setColor(this.client.color);
+    await message.channel.send(embed);
   };
 };
