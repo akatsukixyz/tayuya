@@ -13,7 +13,7 @@ module.exports = class Skip extends Command {
       category: 'music',
       senderPerms: ['SEND_MESSAGES'],
       clientPerms: ['SPEAK', 'CONNECT'],
-      ownerOnly: true
+      ownerOnly: false
     });
     this.client = client;
   }

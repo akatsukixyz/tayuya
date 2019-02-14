@@ -11,7 +11,7 @@ module.exports = class Queue extends Command {
       category: 'music',
       senderPerms: ['SEND_MESSAGES'],
       clientPerms: ['SEND_MESSAGES', 'CONNECT', 'SPEAK'],
-      ownerOnly: true
+      ownerOnly: false
     });
     this.client = client;
   }

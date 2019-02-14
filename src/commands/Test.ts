@@ -11,7 +11,7 @@ module.exports = class Test extends Command {
       category: 'misc',
       senderPerms: ['SEND_MESSAGES'],
       clientPerms: ['SEND_MESSAGES'],
-      ownerOnly: true
+      ownerOnly: false
     });
     this.client = client;
   }

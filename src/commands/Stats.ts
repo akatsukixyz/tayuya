@@ -12,7 +12,7 @@ module.exports = class Stats extends Command {
       category: 'util',
       senderPerms: ['SEND_MESSAGES'],
       clientPerms: ['SEND_MESSAGES'],
-      ownerOnly: true
+      ownerOnly: false
     });
     this.client = client;
   }
