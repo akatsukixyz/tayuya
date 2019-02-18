@@ -17,15 +17,16 @@ module.exports = class Help extends Command {
   }
   async execute(message: Message, args: string[]) {
     async function sendNormal(client: Tayuya){
-        const embed = new MessageEmbed();
+        const embed = new MessageEmbed()
+          .setAuthor(`Help`, client.user.displayAvatarURL())
+          .setColor(client.color);
         const categoriesMap: {[key: string]: string[]} = {};
         for (const command of client.commands.array()) {
           const { category } = command;
           if (!(category in categoriesMap)) categoriesMap[category] = [];
           if(!categoriesMap[category].includes(command.name)) categoriesMap[category].push(command.name);
         }
-        for (const category in categoriesMap) embed.addField(category.replace(category[0], category[0].toUpperCase()), categoriesMap[category].join(', '));
-        embed.setColor(client.color);
+        for (const category in categoriesMap) embed.addField(category.replace(category[0], category[0].toUpperCase()), `\`${categoriesMap[category].join('`, `')}\``);
         return await message.channel.send(embed);
     }
     if(args[0]) {
@@ -37,7 +38,7 @@ module.exports = class Help extends Command {
             .addField(`Usage`, cmd.usage, true)
             .addField(`Aliases`, cmd.aliases.join(', '), true)
             .addField(`Category`, cmd.category, true)
-            .addField(`Permissions`, cmd.senderPerms.join(', '), true)
+            .addField(`Permissions`, `\`${cmd.senderPerms.join('`, `')}\``, true)
             .setColor(this.client.color);
         return await message.channel.send(embed);
     }
