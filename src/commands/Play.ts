@@ -20,7 +20,7 @@ module.exports = class Play extends Command {
     });
     this.client = client;
   };
-  async finish(guild: string): Promise<any> {
+  async finish(guild: string): Promise<void | any> {
     const queue = await Queue.findOne({ guild }),
       songs: QueueType[] = queue.songs;
     if(!songs.length) {
@@ -37,6 +37,7 @@ module.exports = class Play extends Command {
       connection = this.client.connections.get(guild),
       [channel, dispatcher] = await this.playSong(songQuery.video_url, connection),
       song: QueueType = songs[0];
+    console.log(song);
     dispatcher.once('finish', async () => this.finish(guild));
     this.client.connections.set(guild, connection);
     this.client.dispatchers.set(guild, dispatcher);
@@ -45,8 +46,6 @@ module.exports = class Play extends Command {
     await Queue.findOneAndUpdate({ guild }, { $set: { now: song } });
     songs.shift();
     await Queue.findOneAndUpdate({ guild }, { songs });
-    console.log(3);
-    console.log('uo')
     return;
   }
   async findSong(song: string): Promise<ytdl.videoInfo> {
@@ -60,8 +59,7 @@ module.exports = class Play extends Command {
   };
   async playSong(url: string, connection: VoiceConnection): Promise<[VoiceChannel, StreamDispatcher]> {
     const t = await Queue.findOne({ guild: connection.channel.guild.id });
-    console.log(t.now);
-    if(this.client.dispatchers.has(connection.channel.guild.id) || t.now) 
+    if(this.client.dispatchers.has(connection.channel.guild.id) && t.now) 
       return [this.client.vchannels.get(connection.channel.guild.id), this.client.dispatchers.get(connection.channel.guild.id)];
     const dispatcher: StreamDispatcher = await connection.play(ytdl(url));
     return [connection.channel, dispatcher];
@@ -90,6 +88,6 @@ module.exports = class Play extends Command {
       .setAuthor(`Queue Addition`, message.guild.iconURL())
       .addField(`\`${result.title}\``, `URL: ${result.video_url}\nRequester: ${message.author}`)
       .setColor(this.client.color);
-    await message.channel.send(embed);
+    return await message.channel.send(embed);
   };
 };
