@@ -23,7 +23,8 @@ module.exports = class Play extends Command {
   async finish(guild: string): Promise<any> {
     const queue = await Queue.findOne({ guild }),
       songs: QueueType[] = queue.songs;
-    if(songs.length === 0) {
+    if(!songs.length) {
+      console.log(1);
       await this.client.vchannels.get(guild).leave();
       this.client.vchannels.delete(guild);
       this.client.dispatchers.delete(guild);
@@ -31,6 +32,7 @@ module.exports = class Play extends Command {
       await Queue.findOneAndUpdate({ guild }, { $unset: { now: '' } });
       return;
     };
+    console.log(2);
     const songQuery = await this.findSong(songs[0].url || songs[0].name),
       connection = this.client.connections.get(guild),
       [channel, dispatcher] = await this.playSong(songQuery.video_url, connection),
@@ -42,7 +44,9 @@ module.exports = class Play extends Command {
 
     await Queue.findOneAndUpdate({ guild }, { $set: { now: song } });
     songs.shift();
-    await Queue.findOneAndUpdate({ guild }, { $set: { songs } });
+    await Queue.findOneAndUpdate({ guild }, { songs });
+    console.log(3);
+    console.log('uo')
     return;
   }
   async findSong(song: string): Promise<ytdl.videoInfo> {
@@ -50,12 +54,16 @@ module.exports = class Play extends Command {
       return new Promise((resolve, reject) => { youtubeSearch(query, options, (err, results) => { if(err) reject(err); else resolve(results); }); }); 
     }; 
    const opts: youtubeSearch.YouTubeSearchOptions = { maxResults: 1, key: process.env.YOUTUBE };
-    if(new RegExp(/(https:\/\/(www)?\.youtube\.com|https:\/\/(www)?youtu\.be)/, 'i').test(song)) return await ytdl.getInfo(song) || null;
-    try{ var results = await search(song, opts); } catch(e) { console.log(e); };
+    if(/(https:\/\/(www)?\.youtube\.com|https:\/\/(www)?youtu\.be)/i.test(song)) return await ytdl.getInfo(song) || null;
+    try { var results = await search(song, opts); } catch(e) { console.log(e); };
     return await ytdl.getInfo(results[0].link) || null;
   };
   async playSong(url: string, connection: VoiceConnection): Promise<[VoiceChannel, StreamDispatcher]> {
-    var dispatcher: StreamDispatcher = await connection.play(ytdl(url));
+    const t = await Queue.findOne({ guild: connection.channel.guild.id });
+    console.log(t.now);
+    if(this.client.dispatchers.has(connection.channel.guild.id) || t.now) 
+      return [this.client.vchannels.get(connection.channel.guild.id), this.client.dispatchers.get(connection.channel.guild.id)];
+    const dispatcher: StreamDispatcher = await connection.play(ytdl(url));
     return [connection.channel, dispatcher];
   };
   async pullThrough(connection: VoiceConnection, dispatcher: StreamDispatcher, results: ytdl.videoInfo, guild: string, author: string): Promise<any> {
@@ -65,8 +73,8 @@ module.exports = class Play extends Command {
     const queue = await Queue.findOne({ guild }),
       songs: QueueType[] = queue.songs;
     const song: QueueType = { name: results.title, url: results.video_url, author: author };
-    if(songs.length === 0 && !queue.now) return await Queue.findOneAndUpdate({ guild }, { $set: { now: song } });
-    else if (queue.now) return await this.client.pushQueue(song, guild);
+    if(!songs.length && !queue.now) return await Queue.findOneAndUpdate({ guild }, { now: song });
+    else return await this.client.pushQueue(song, guild);
   };
   async execute(message: Message, args: string[]) {
     if(!message.member.voice.channel) return await message.channel.send(`Error: You must be connected to a voice channel!`);
@@ -74,13 +82,13 @@ module.exports = class Play extends Command {
     const result = await this.findSong(args.join(' ').trim());
     if(!result) return await message.channel.send(`Error: No video found.`);
     var connection = this.client.connections.get(message.guild.id) || await message.member.voice.channel.join();
-    try { var [vchan, dispatcher] = await this.playSong(result.video_url, connection); }
+    try { var [, dispatcher] = await this.playSong(result.video_url, connection); }
     catch(e) { return console.log(e) };
     dispatcher.once('finish', async () => await this.finish(message.guild.id));
     await this.pullThrough(connection, dispatcher, result, message.guild.id, message.author.id);
     const embed = new MessageEmbed()
       .setAuthor(`Queue Addition`, message.guild.iconURL())
-      .addField(`${result.title}`, `URL: ${result.video_url}\nRequester: ${message.author}`)
+      .addField(`\`${result.title}\``, `URL: ${result.video_url}\nRequester: ${message.author}`)
       .setColor(this.client.color);
     await message.channel.send(embed);
   };

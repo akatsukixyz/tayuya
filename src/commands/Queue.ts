@@ -22,7 +22,7 @@ module.exports = class Queue extends Command {
         const embed = new MessageEmbed()
             .setAuthor(`Queue`, message.guild.iconURL())
             .setColor(client.color);
-        if(now) embed.addField(`Now Playing: ${now.name}`, `URL: ${now.url}\nRequester: <@${now.author}>`);
+        if(now) embed.addField(`Now Playing: \`${now.name}\``, `URL: ${now.url}\nRequester: <@${now.author}>`);
         for(let i = 0; i < songs.length; i++) embed.addField(`#${i+1} | \`${songs[i].name}\``, `URL: ${songs[i].url}\nRequester: <@${songs[i].author}>`, true);
         return await message.channel.send(embed);
       } 
