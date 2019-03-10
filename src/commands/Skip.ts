@@ -28,8 +28,8 @@ module.exports = class Skip extends Command {
         song: QueueType = res.now,
         songs: QueueType[] = res.songs;
     if(!song) return await message.channel.send(`Error: There is no song currently playing.`);
-    if(!songs.length) return await message.channel.send(`Error: There is are no songs in the queue.`);
-    dispatcher.emit('finish');
+    if(!songs.length) return await message.channel.send(`Error: There are no songs in the queue.`);
+    dispatcher.end();
     return await message.channel.send(`Skipped \`${song.name}\`. Now playing \`${res.songs[0].name}\``);
   }
 }

@@ -24,7 +24,6 @@ module.exports = class Play extends Command {
     const queue = await Queue.findOne({ guild }),
       songs: QueueType[] = queue.songs;
     if(!songs.length) {
-      console.log(1);
       await this.client.vchannels.get(guild).leave();
       this.client.vchannels.delete(guild);
       this.client.dispatchers.delete(guild);
@@ -32,13 +31,11 @@ module.exports = class Play extends Command {
       await Queue.findOneAndUpdate({ guild }, { $unset: { now: '' } });
       return;
     };
-    console.log(2);
     const songQuery = await this.findSong(songs[0].url || songs[0].name),
       connection = this.client.connections.get(guild),
       [channel, dispatcher] = await this.playSong(songQuery.video_url, connection),
       song: QueueType = songs[0];
-    console.log(song);
-    dispatcher.once('finish', async () => this.finish(guild));
+    dispatcher.on('end', async () => this.finish(guild));
     this.client.connections.set(guild, connection);
     this.client.dispatchers.set(guild, dispatcher);
     this.client.vchannels.set(guild, channel);
@@ -82,7 +79,7 @@ module.exports = class Play extends Command {
     var connection = this.client.connections.get(message.guild.id) || await message.member.voice.channel.join();
     try { var [, dispatcher] = await this.playSong(result.video_url, connection); }
     catch(e) { return console.log(e) };
-    dispatcher.once('finish', async () => await this.finish(message.guild.id));
+    dispatcher.once('end', async () => await this.finish(message.guild.id));
     await this.pullThrough(connection, dispatcher, result, message.guild.id, message.author.id);
     const embed = new MessageEmbed()
       .setAuthor(`Queue Addition`, message.guild.iconURL())

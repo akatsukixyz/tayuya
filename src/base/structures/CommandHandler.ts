@@ -6,11 +6,11 @@ export class CommandHandler {
   public client!: BaseClient;
     constructor(client: BaseClient) { this.client = client; };
     load(): any {
-        readdir(resolve(`.../../dist/${this.client.commandsDir}`), (err, files) => { 
+        readdir(resolve(this.client.commandsDir), (err, files) => { 
           if(err) throw new Error(`Command Error: ${err}`);
           for (const file of files) {
             if (!file.endsWith('.js')) continue;
-            const classThing = require(resolve(`.../../dist/${this.client.commandsDir}/${file}`));
+            const classThing = require(resolve(`${this.client.commandsDir}/${file}`));
             const Command = new classThing(this.client);
             this.client.commands.set(Command.name.toLowerCase(), Command);
             Command.aliases.forEach(alias => {
